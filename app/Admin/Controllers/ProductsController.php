@@ -65,7 +65,7 @@ class ProductsController extends Controller
     {
         return Admin::grid(Product::class, function (Grid $grid) {
             // 使用 with 来预加载商品类目数据，减少 SQL 查询
-            $grid->model()->with(['category']);
+            $grid->model()->->where('type', Product::TYPE_NORMAL)->with(['category']);
             $grid->id('ID')->sortable();
             $grid->title('商品名称');
             // Laravel-Admin 支持用符号 . 来展示关联关系的字段
@@ -126,6 +126,9 @@ class ProductsController extends Controller
             $form->saving(function (Form $form) {
                 $form->model()->price = collect($form->input('skus'))->where(Form::REMOVE_FLAG_NAME, 0)->min('price') ?: 0;
             });
+			
+			// 在表单中添加一个名为 type，值为 Product::TYPE_NORMAL 的隐藏字段
+            $form->hidden('type')->value(Product::TYPE_NORMAL);
         });
     }
 }
